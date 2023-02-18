@@ -9,8 +9,8 @@
 
 #undef assert
 
-static void
-__assert( char const *, int, char const *, char const * );
+static __attribute__((unused))
+void __assert( char const *, int, char const *, char const * );
 
 #define assert( x )    \
   ( (x)                \
@@ -21,8 +21,8 @@ __assert( char const *, int, char const *, char const * );
 #define assert(x) ((void)0)
 #endif
 
-static void
-__assert( char const * file, int line, char const * func, char const * expr )
+static __attribute__((unused))
+void __assert( char const * file, int line, char const * func, char const * expr )
 {
   printf("%s:%d: %s: Assertion '%s' failed.\n", file, line, func, expr);
   abort();
