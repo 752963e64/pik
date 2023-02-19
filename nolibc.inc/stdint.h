@@ -124,18 +124,18 @@ typedef   signed long     ptrdiff_t;
 #define WINT_MAX             UINT16_MAX /* no clue what for... investigation needed. */
 
 /* standard macro definitions */
-#define INTMAX_C(value)  ( (intmax_t)(value) )
-#define UINTMAX_C(value) ( (uintmax_t)(value) )
+#define INTMAX_C(value)  ( (intmax_t)( value ) & LLONG_MAX ) )
+#define UINTMAX_C(value) ( (uintmax_t)( value ) & ULLONG_MAX )
 
-#define INT8_C(value)  ( (int_least8_t)( ( (value) ) & 0x7f ) )
-#define INT16_C(value) ( (int_least16_t)( ( (value) ) & 0x7fff ) )
-#define INT32_C(value) ( (int_least32_t)( ( (value) ) & 0x7fffffff ) )
-#define INT64_C(value) ( (int_least64_t)( ( (value) ) & 0x7fffffffffffffff ) )
+#define INT8_C(value)  ( (int_least8_t)( ( (value) ) & CHAR_MAX ) )
+#define INT16_C(value) ( (int_least16_t)( ( (value) ) & SHRT_MAX ) )
+#define INT32_C(value) ( (int_least32_t)( ( (value) ) & INT_MAX ) )
+#define INT64_C(value) ( (int_least64_t)( ( (value) ) & LLONG_MAX ) )
 
-#define UINT8_C(value)  ( (uint_least8_t)( ( (value) ) & 0xff ) )
-#define UINT16_C(value) ( (uint_least16_t)( ( value) ) & 0xffff ) )
-#define UINT32_C(value) ( (uint_least32_t)( ( (value) ) & 0xffffffff ) )
-#define UINT64_C(value) ( (uint_least64_t)( ( (value) ) & 0xffffffffffffffff ) )
+#define UINT8_C(value)  ( (uint_least8_t)( ( value ) & UCHAR_MAX ) )
+#define UINT16_C(value) ( (uint_least16_t)( ( value ) & USHRT_MAX ) )
+#define UINT32_C(value) ( (uint_least32_t)( ( value ) & UINT_MAX ) )
+#define UINT64_C(value) ( (uint_least64_t)( ( value ) & ULLONG_MAX ) )
 
 /* those are commonly provided by sys/types.h */
 typedef unsigned int          dev_t;
