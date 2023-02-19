@@ -9,17 +9,18 @@
 
 #undef assert
 
-static __attribute__((unused))
-void __assert( char const *, int, char const *, char const * );
+#ifdef NDEBUG
+
+#define assert(x) ((void)0)
+
+#else
+
+static void __assert( char const *, int, char const *, char const * );
 
 #define assert( x )    \
   ( (x)                \
   ? (void)0            \
   : __assert( __FILE__, __LINE__, __func__, #x ))
-
-#ifdef NDEBUG
-#define assert(x) ((void)0)
-#endif
 
 static __attribute__((unused))
 void __assert( char const * file, int line, char const * func, char const * expr )
@@ -28,5 +29,6 @@ void __assert( char const * file, int line, char const * func, char const * expr
   abort();
 }
 
-#endif
+#endif /* NDEBUG */
 
+#endif /* _NOLIBC_ASSERT_H */
