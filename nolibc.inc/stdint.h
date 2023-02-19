@@ -3,9 +3,10 @@
  * Standard definitions and types for NOLIBC
  * Copyright (C) 2017-2021 Willy Tarreau <w@1wt.eu>
  * -----------------------------------------------
- * Added some standard type definitions.
+ * Added full standard type definitions.
  * previously std.h renamed to stdint.h.
- * Copyright (C) 2023 HackIT
+ * removed NULL definition
+ * Copyright (C) 2023 HackIT <752963e64@tutanota.com>
  */
 
 #ifndef _NOLIBC_STDINT_H
@@ -16,11 +17,6 @@
  * integer type definitions and generic macros here, but avoid OS-specific and
  * syscall-specific stuff, as this file is expected to be included very early.
  */
-
-/* note: may already be defined */
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
 
 
 /* exact width integer types */
@@ -99,6 +95,10 @@ typedef   signed long long  int_fast64_t;
 typedef unsigned long     uintptr_t;
 typedef   signed long      intptr_t;
 
+#define PTRDIFF_MIN          INT32_MIN
+#define PTRDIFF_MAX          INT32_MAX
+typedef   signed long     ptrdiff_t;
+
 
 /* greatest width integer types */
 #define INTMAX_MIN           LLONG_MIN
@@ -108,12 +108,10 @@ typedef signed long long     intmax_t;
 typedef unsigned long long  uintmax_t;
 
 
-#define SIZE_MAX             UINT32_MAX /* ??? shouldn't this be ULLONG_MAX? */
+#define SIZE_MAX             ULONG_MAX /* ??? shouldn't this be ULONG_MAX? [DONE] */
 typedef unsigned long        size_t;
 typedef   signed long       ssize_t;
-#define PTRDIFF_MIN          INT32_MIN
-#define PTRDIFF_MAX          INT32_MAX
-typedef   signed long     ptrdiff_t;
+
 #define SIG_ATOMIC_MIN       INT32_MAX
 #define SIG_ATOMIC_MAX       INT32_MAX
 
@@ -123,9 +121,10 @@ typedef   signed long     ptrdiff_t;
 #define WINT_MIN             0
 #define WINT_MAX             UINT16_MAX /* no clue what for... investigation needed. */
 
+
 /* standard macro definitions */
-#define INTMAX_C(value)  ( (intmax_t)( value ) & LLONG_MAX ) )
-#define UINTMAX_C(value) ( (uintmax_t)( value ) & ULLONG_MAX )
+#define INTMAX_C(value)  ( (intmax_t)( (value) & LLONG_MAX ) )
+#define UINTMAX_C(value) ( (uintmax_t)( (value) & ULLONG_MAX ) )
 
 #define INT8_C(value)  ( (int_least8_t)( (value)  & CHAR_MAX ) )
 #define INT16_C(value) ( (int_least16_t)( (value) & SHRT_MAX ) )
@@ -136,6 +135,7 @@ typedef   signed long     ptrdiff_t;
 #define UINT16_C(value) ( (uint_least16_t)( (value) & USHRT_MAX ) )
 #define UINT32_C(value) ( (uint_least32_t)( (value) & UINT_MAX ) )
 #define UINT64_C(value) ( (uint_least64_t)( (value) & ULLONG_MAX ) )
+
 
 /* those are commonly provided by sys/types.h */
 typedef unsigned int          dev_t;
