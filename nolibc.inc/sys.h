@@ -2,6 +2,9 @@
 /*
  * Syscall definitions for NOLIBC (those in man(2))
  * Copyright (C) 2017-2021 Willy Tarreau <w@1wt.eu>
+ * -----------------------------------------------
+ * change syscall handling & adds missing ones.
+ * Copyright (C) 2023 HackIT <752963e64@tutanota.com>
  */
 
 #ifndef _NOLIBC_SYS_H
@@ -129,7 +132,7 @@ int sys_fchdir(int dfd)
 }
 
 static __attribute__((unused))
-int fchdir(dfd)
+int fchdir(int dfd)
 {
 	int ret = sys_fchdir(dfd);
 
@@ -347,6 +350,7 @@ int chown(const char *path, uid_t owner, gid_t group)
  * int chroot(const char *path);
  */
 
+#ifdef __NR_chroot
 static __attribute__((unused))
 int sys_chroot(const char *path)
 {
@@ -364,12 +368,17 @@ int chroot(const char *path)
 	}
 	return ret;
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_chroot isn't defined, cannot implement sys_chroot()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_chroot */
 
 /*
  * int close(int fd);
  */
 
+#ifedf __NR_close
 static __attribute__((unused))
 int sys_close(int fd)
 {
@@ -387,12 +396,17 @@ int close(int fd)
 	}
 	return ret;
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_close isn't defined, cannot implement sys_close()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_close */
 
 /*
  * int dup(int fd);
  */
 
+#ifdef __NR_dup
 static __attribute__((unused))
 int sys_dup(int fd)
 {
@@ -410,22 +424,21 @@ int dup(int fd)
 	}
 	return ret;
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_dup isn't defined, cannot implement sys_dup()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_dup */
 
 /*
  * int dup2(int old, int new);
  */
 
+#ifdef __NR_dup2
 static __attribute__((unused))
 int sys_dup2(int old, int new)
 {
-#ifdef __NR_dup3
-	return my_syscall3(__NR_dup3, old, new, 0);
-#elif defined(__NR_dup2)
 	return my_syscall2(__NR_dup2, old, new);
-#else
-#error Neither __NR_dup3 nor __NR_dup2 defined, cannot implement sys_dup2()
-#endif
 }
 
 static __attribute__((unused))
@@ -439,7 +452,11 @@ int dup2(int old, int new)
 	}
 	return ret;
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_dup2 isn't defined, cannot implement sys_dup2()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_dup2 */
 
 /*
  * int dup3(int old, int new, int flags);
@@ -463,13 +480,18 @@ int dup3(int old, int new, int flags)
 	}
 	return ret;
 }
-#endif
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_dup3 isn't defined, cannot implement sys_dup3()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_dup3 */
 
 
 /*
  * int execve(const char *filename, char *const argv[], char *const envp[]);
  */
 
+#ifedf __NR_execve
 static __attribute__((unused))
 int sys_execve(const char *filename, char *const argv[], char *const envp[])
 {
@@ -487,7 +509,39 @@ int execve(const char *filename, char *const argv[], char *const envp[])
 	}
 	return ret;
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_execve isn't defined, cannot implement sys_execve()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_execve */
 
+/*
+ * int execveat(int dfd, const char *filename, char *const argv[], char *const envp[]);
+ */
+
+#ifdef __NR_execveat
+static __attribute__((unused))
+int sys_execveat(int dfd, const char *filename, char *const argv[], char *const envp[])
+{
+	return my_syscall3(__NR_execveat, dfd, filename, argv, envp);
+}
+
+static __attribute__((unused))
+int execveat(int dfd, const char *filename, char *const argv[], char *const envp[])
+{
+	int ret = sys_execveat(dfd, filename, argv, envp);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_execveat isn't defined, cannot implement sys_execveat()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_execveat */
 
 /*
  * void exit(int status);
