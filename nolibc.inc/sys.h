@@ -831,6 +831,7 @@ pid_t gettid(void)
  * int gettimeofday(struct timeval *tv, struct timezone *tz);
  */
 
+#ifdef __NR_gettimeofday
 static __attribute__((unused))
 int sys_gettimeofday(struct timeval *tv, struct timezone *tz)
 {
@@ -848,7 +849,39 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 	}
 	return ret;
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_gettimeofday isn't defined, cannot implement sys_gettimeofday()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_gettimeofday */
 
+/*
+ * int gettimeofday(const struct timeval *tv, const struct timezone *tz);
+ */
+
+#ifdef __NR_gettimeofday
+static __attribute__((unused))
+int sys_settimeofday(const struct timeval *tv, const struct timezone *tz)
+{
+	return my_syscall2(__NR_gettimeofday, tv, tz);
+}
+
+static __attribute__((unused))
+int settimeofday(const struct timeval *tv, const struct timezone *tz)
+{
+	int ret = sys_settimeofday(tv, tz);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_settimeofday isn't defined, cannot implement sys_settimeofday()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_settimeofday */
 
 /*
  * int ioctl(int fd, unsigned long req, void *value);
