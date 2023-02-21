@@ -516,20 +516,23 @@ int execve(const char *filename, char *const argv[], char *const envp[])
 #endif /* __NR_execve */
 
 /*
- * int execveat(int dfd, const char *filename, char *const argv[], char *const envp[]);
+ * int execveat(int dfd, const char *filename,
+   char *const argv[], char *const envp[], int flags);
  */
 
 #ifdef __NR_execveat
 static __attribute__((unused))
-int sys_execveat(int dfd, const char *filename, char *const argv[], char *const envp[])
+int sys_execveat(int dfd, const char *filename,
+  char *const argv[], char *const envp[], int flags)
 {
-	return my_syscall3(__NR_execveat, dfd, filename, argv, envp);
+	return my_syscall5(__NR_execveat, dfd, filename, argv, envp, flags);
 }
 
 static __attribute__((unused))
-int execveat(int dfd, const char *filename, char *const argv[], char *const envp[])
+int execveat(int dfd, const char *filename,
+  char *const argv[], char *const envp[], int flags)
 {
-	int ret = sys_execveat(dfd, filename, argv, envp);
+	int ret = sys_execveat(dfd, filename, argv, envp, flags);
 
 	if (ret < 0) {
 		SET_ERRNO(-ret);
@@ -559,26 +562,43 @@ void exit(int status)
 {
 	sys_exit(status);
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_exit isn't defined, cannot implement sys_exit()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_exit */
 
+/*
+ * void exit_group(int status);
+ */
+
+static __attribute__((noreturn,unused))
+void sys_exit_group(int status)
+{
+	my_syscall1(__NR_exit_group, status & 255);
+	while(1); // shut the "noreturn" warnings.
+}
+
+static __attribute__((noreturn,unused))
+void exit_group(int status)
+{
+	sys_exit_group(status);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_exit_group isn't defined, cannot implement sys_exit_group()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_exit_group */
 
 /*
  * pid_t fork(void);
  */
 
+#ifdef __NR_fork
 static __attribute__((unused))
 pid_t sys_fork(void)
 {
-#ifdef __NR_clone
-	/* note: some archs only have clone() and not fork(). Different archs
-	 * have a different API, but most archs have the flags on first arg and
-	 * will not use the rest with no other flag.
-	 */
-	return my_syscall5(__NR_clone, SIGCHLD, 0, 0, 0, 0);
-#elif defined(__NR_fork)
 	return my_syscall0(__NR_fork);
-#else
-#error Neither __NR_clone nor __NR_fork defined, cannot implement sys_fork()
-#endif
 }
 
 static __attribute__((unused))
@@ -592,12 +612,53 @@ pid_t fork(void)
 	}
 	return ret;
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_fork isn't defined, cannot implement sys_fork()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_fork */
 
+/*
+ * long clone(unsigned long flags, void *child_stack,
+     int *ptid, int *ctid,
+     unsigned long newtls);
+ */
+
+#ifdef __NR_clone
+static __attribute__((unused))
+long sys_clone(unsigned long flags, void *child_stack,
+  int *ptid, int *ctid,
+  unsigned long newtls)
+{ /* x86-64 */
+	return my_syscall5(__NR_clone, flags, child_stack, ptid, ctid, newtls);
+}
+
+static __attribute__((unused))
+long clone(unsigned long flags, void *child_stack,
+  int *ptid, int *ctid,
+  unsigned long newtls)
+{
+	pid_t ret = sys_clone(flags, child_stack, ptid, ctid, newtls);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clone isn't defined, cannot implement sys_clone()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clone */
+
+/* __NR_clone3 */
 
 /*
  * int fsync(int fd);
  */
 
+#ifdef __NR_fsync
 static __attribute__((unused))
 int sys_fsync(int fd)
 {
@@ -615,12 +676,17 @@ int fsync(int fd)
 	}
 	return ret;
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_fsync isn't defined, cannot implement sys_fsync()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_fsync */
 
 /*
  * int getdents64(int fd, struct linux_dirent64 *dirp, int count);
  */
 
+#ifdef __NR_getdents64
 static __attribute__((unused))
 int sys_getdents64(int fd, struct linux_dirent64 *dirp, int count)
 {
@@ -638,12 +704,18 @@ int getdents64(int fd, struct linux_dirent64 *dirp, int count)
 	}
 	return ret;
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getdents64 isn't defined, cannot implement sys_getdents64()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getdents64 */
 
 
 /*
  * pid_t getpgid(pid_t pid);
  */
 
+#ifdef __NR_getpgid
 static __attribute__((unused))
 pid_t sys_getpgid(pid_t pid)
 {
@@ -661,12 +733,17 @@ pid_t getpgid(pid_t pid)
 	}
 	return ret;
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getpgid isn't defined, cannot implement sys_getpgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getpgid */
 
 /*
  * pid_t getpgrp(void);
  */
 
+#ifdef __NR_getpgrp
 static __attribute__((unused))
 pid_t sys_getpgrp(void)
 {
@@ -678,12 +755,17 @@ pid_t getpgrp(void)
 {
 	return sys_getpgrp();
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getpgrp isn't defined, cannot implement sys_getpgrp()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getpgrp */
 
 /*
  * pid_t getpid(void);
  */
 
+#ifdef __NR_getpid
 static __attribute__((unused))
 pid_t sys_getpid(void)
 {
@@ -695,12 +777,17 @@ pid_t getpid(void)
 {
 	return sys_getpid();
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getpid isn't defined, cannot implement sys_getpid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getpid */
 
 /*
  * pid_t getppid(void);
  */
 
+#ifdef __NR_getppid
 static __attribute__((unused))
 pid_t sys_getppid(void)
 {
@@ -712,12 +799,17 @@ pid_t getppid(void)
 {
 	return sys_getppid();
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getppid isn't defined, cannot implement sys_getppid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getppid */
 
 /*
  * pid_t gettid(void);
  */
 
+#ifdef __NR_gettid
 static __attribute__((unused))
 pid_t sys_gettid(void)
 {
@@ -729,7 +821,11 @@ pid_t gettid(void)
 {
 	return sys_gettid();
 }
-
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_gettid isn't defined, cannot implement sys_gettid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_gettid */
 
 /*
  * int gettimeofday(struct timeval *tv, struct timezone *tz);
