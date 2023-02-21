@@ -828,6 +828,46 @@ pid_t gettid(void)
 #endif /* __NR_gettid */
 
 /*
+ * pid_t getuid(void);
+ */
+
+#ifdef __NR_getuid
+static __attribute__((unused))
+pid_t sys_getuid(void)
+{
+	return my_syscall0(__NR_getuid);
+}
+
+static __attribute__((unused))
+pid_t getuid(void)
+{
+	return sys_getuid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getuid isn't defined, cannot implement sys_getuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getuid */
+
+#ifdef __NR_geteuid
+static __attribute__((unused))
+pid_t sys_geteuid(void)
+{
+	return my_syscall0(__NR_geteuid);
+}
+
+static __attribute__((unused))
+pid_t geteuid(void)
+{
+	return sys_geteuid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_geteuid isn't defined, cannot implement sys_geteuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_geteuid */
+
+/*
  * int gettimeofday(struct timeval *tv, struct timezone *tz);
  */
 
@@ -856,14 +896,14 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 #endif /* __NR_gettimeofday */
 
 /*
- * int gettimeofday(const struct timeval *tv, const struct timezone *tz);
+ * int settimeofday(const struct timeval *tv, const struct timezone *tz);
  */
 
-#ifdef __NR_gettimeofday
+#ifdef __NR_settimeofday
 static __attribute__((unused))
 int sys_settimeofday(const struct timeval *tv, const struct timezone *tz)
 {
-	return my_syscall2(__NR_gettimeofday, tv, tz);
+	return my_syscall2(__NR_settimeofday, tv, tz);
 }
 
 static __attribute__((unused))
