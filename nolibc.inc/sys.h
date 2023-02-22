@@ -849,6 +849,32 @@ pid_t getuid(void)
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_getuid */
 
+/*
+ * pid_t getgid(void);
+ */
+
+#ifdef __NR_getgid
+static __attribute__((unused))
+pid_t sys_getgid(void)
+{
+	return my_syscall0(__NR_getgid);
+}
+
+static __attribute__((unused))
+pid_t getgid(void)
+{
+	return sys_getgid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getgid isn't defined, cannot implement sys_getgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getgid */
+
+/*
+ * pid_t geteuid(void);
+ */
+
 #ifdef __NR_geteuid
 static __attribute__((unused))
 pid_t sys_geteuid(void)
@@ -866,6 +892,28 @@ pid_t geteuid(void)
 #error __NR_geteuid isn't defined, cannot implement sys_geteuid()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_geteuid */
+
+/*
+ * pid_t getegid(void);
+ */
+
+#ifdef __NR_geteuid
+static __attribute__((unused))
+pid_t sys_getegid(void)
+{
+	return my_syscall0(__NR_geteuid);
+}
+
+static __attribute__((unused))
+pid_t getegid(void)
+{
+	return sys_getegid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getegid isn't defined, cannot implement sys_getegid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getegid */
 
 /*
  * int gettimeofday(struct timeval *tv, struct timezone *tz);
@@ -927,6 +975,7 @@ int settimeofday(const struct timeval *tv, const struct timezone *tz)
  * int ioctl(int fd, unsigned long req, void *value);
  */
 
+#ifdef __NR_ioctl
 static __attribute__((unused))
 int sys_ioctl(int fd, unsigned long req, void *value)
 {
@@ -944,6 +993,11 @@ int ioctl(int fd, unsigned long req, void *value)
 	}
 	return ret;
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_ioctl isn't defined, cannot implement sys_ioctl()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_ioctl */
 
 /*
  * int kill(pid_t pid, int signal);
