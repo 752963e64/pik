@@ -683,7 +683,95 @@ int fsync(int fd)
 #endif /* __NR_fsync */
 
 /*
- * int getdents64(int fd, struct linux_dirent64 *dirp, int count);
+ * int getcpu(unsigned int *cpu, unsigned int *node);
+ */
+
+#ifdef __NR_getcpu
+static __attribute__((unused))
+int sys_getcpu(unsigned int *cpu, unsigned int *node)
+{
+	return my_syscall2(__NR_getcpu, cpu, node);
+}
+
+static __attribute__((unused))
+int getcpu(unsigned int *cpu, unsigned int *node)
+{
+	int ret = sys_getcpu(cpu, node);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getcpu isn't defined, cannot implement sys_getcpu()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getcpu */
+
+/*
+ char *getcwd(char *buf, size_t size);
+*/
+
+#ifdef __NR_gecwd
+static __attribute__((unused))
+int sys_getcwd(char *buf, size_t size)
+{
+	return my_syscall2(__NR_getcwd, buf, size);
+}
+
+static __attribute__((unused))
+int getcwd(char *buf, size_t size)
+{
+	int ret = sys_getcwd(buf, size);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getcwd isn't defined, cannot implement sys_getcwd()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getcwd */
+
+/*
+ * int getdents(unsigned int fd,
+ *  struct linux_dirent *dirp, unsigned int count)
+ */
+
+#ifdef __NR_getdents
+static __attribute__((unused))
+int sys_getdents(unsigned int fd,
+  struct linux_dirent *dirp, unsigned int count)
+{
+	return my_syscall3(__NR_getdents, fd, dirp, count);
+}
+
+static __attribute__((unused))
+int getdents(unsigned int fd,
+  struct linux_dirent *dirp, unsigned int count)
+{
+	int ret = sys_getdents(fd, dirp, count);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getdents isn't defined, cannot implement sys_getdents()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getdents */
+
+/*
+ * int getdents64(unsigned int fd,
+ *  struct linux_dirent64 *dirp, unsigned int count)
  */
 
 #ifdef __NR_getdents64
@@ -709,7 +797,6 @@ int getdents64(int fd, struct linux_dirent64 *dirp, int count)
 #error __NR_getdents64 isn't defined, cannot implement sys_getdents64()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_getdents64 */
-
 
 /*
  * pid_t getpgid(pid_t pid);
@@ -806,6 +893,12 @@ pid_t getppid(void)
 #endif /* __NR_getppid */
 
 /*
+       int getpriority(int which, id_t who);
+       int setpriority(int which, id_t who, int prio);
+       ssize_t getrandom(void *buf, size_t buflen, unsigned int flags);
+*/
+
+/*
  * pid_t gettid(void);
  */
 
@@ -828,7 +921,7 @@ pid_t gettid(void)
 #endif /* __NR_gettid */
 
 /*
- * pid_t getuid(void);
+ * uid_t getuid(void);
  */
 
 #ifdef __NR_getuid
@@ -839,7 +932,7 @@ pid_t sys_getuid(void)
 }
 
 static __attribute__((unused))
-pid_t getuid(void)
+int getuid(void)
 {
 	return sys_getuid();
 }
@@ -848,6 +941,28 @@ pid_t getuid(void)
 #error __NR_getuid isn't defined, cannot implement sys_getuid()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_getuid */
+
+/*
+ * int setuid(uid_t uid);
+ */
+
+#ifdef __NR_setuid
+static __attribute__((unused))
+uid_t sys_setuid(uid_t uid)
+{
+	return my_syscall1(__NR_setuid, uid);
+}
+
+static __attribute__((unused))
+uid_t setuid(uid_t uid)
+{
+	return sys_setuid(uid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setuid isn't defined, cannot implement sys_setuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setuid */
 
 /*
  * pid_t getgid(void);
@@ -870,6 +985,28 @@ pid_t getgid(void)
 #error __NR_getgid isn't defined, cannot implement sys_getgid()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_getgid */
+
+/*
+ * pid_t setgid(gid_t gid);
+ */
+
+#ifdef __NR_setgid
+static __attribute__((unused))
+pid_t sys_setgid(gid_t gid)
+{
+	return my_syscall1(__NR_setgid, gid);
+}
+
+static __attribute__((unused))
+pid_t setgid(gid_t gid)
+{
+	return sys_setgid(gid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setgid isn't defined, cannot implement sys_setgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setgid */
 
 /*
  * pid_t geteuid(void);
@@ -897,11 +1034,11 @@ pid_t geteuid(void)
  * pid_t getegid(void);
  */
 
-#ifdef __NR_geteuid
+#ifdef __NR_getegid
 static __attribute__((unused))
 pid_t sys_getegid(void)
 {
-	return my_syscall0(__NR_geteuid);
+	return my_syscall0(__NR_getegid);
 }
 
 static __attribute__((unused))
@@ -914,6 +1051,175 @@ pid_t getegid(void)
 #error __NR_getegid isn't defined, cannot implement sys_getegid()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_getegid */
+
+/*
+       int getgroups(int size, gid_t list[]);
+       int setgroups(size_t size, const gid_t *list);
+*/
+
+/*
+ * int setreuid(uid_t ruid, uid_t euid);
+ */
+
+#ifdef __NR_setreuid
+static __attribute__((unused))
+pid_t sys_setreuid(uid_t ruid, uid_t euid)
+{
+	return my_syscall2(__NR_setreuid, ruid, euid);
+}
+
+static __attribute__((unused))
+pid_t setreuid(uid_t ruid, uid_t euid)
+{
+	return sys_setreuid(ruid, euid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setreuid isn't defined, cannot implement sys_setreuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setreuid */
+
+/*
+ * int setregid(gid_t rgid, gid_t egid);
+ */
+
+#ifdef __NR_setregid
+static __attribute__((unused))
+pid_t sys_setregid(uid_t ruid, uid_t euid)
+{
+	return my_syscall2(__NR_setregid, ruid, euid);
+}
+
+static __attribute__((unused))
+pid_t setregid(uid_t ruid, uid_t euid)
+{
+	return sys_setregid(ruid, euid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setregid isn't defined, cannot implement sys_setregid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setregid */
+
+/*
+       int gethostname(char *name, size_t len);
+       int sethostname(const char *name, size_t len);
+       int getitimer(int which, struct itimerval *curr_value);
+       int setitimer(int which, const struct itimerval *restrict new_value,
+                     struct itimerval *restrict old_value);
+*/
+
+
+/*
+ * int setregid(gid_t rgid, gid_t egid);
+ */
+
+#ifdef __NR_setregid
+static __attribute__((unused))
+pid_t sys_setregid(uid_t ruid, uid_t euid)
+{
+	return my_syscall2(__NR_setregid, ruid, euid);
+}
+
+static __attribute__((unused))
+pid_t setregid(uid_t ruid, uid_t euid)
+{
+	return sys_setregid(ruid, euid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setregid isn't defined, cannot implement sys_setregid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setregid */
+
+
+/*
+ * int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+ */
+
+#ifdef __NR_setresuid
+static __attribute__((unused))
+pid_t sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
+{
+	return my_syscall3(__NR_setresuid, ruid, euid, suid);
+}
+
+static __attribute__((unused))
+pid_t setresuid(uid_t ruid, uid_t euid, uid_t suid)
+{
+	return sys_setresuid(ruid, euid, suid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setresuid isn't defined, cannot implement sys_setresuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setresuid */
+
+/*
+ *int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+ */
+
+#ifdef __NR_setresgid
+static __attribute__((unused))
+pid_t sys_setresgid(uid_t ruid, uid_t euid, gid_t sgid)
+{
+	return my_syscall3(__NR_setresgid, ruid, euid, sgid);
+}
+
+static __attribute__((unused))
+pid_t setresgid(uid_t ruid, uid_t euid, gid_t sgid)
+{
+	return sys_setresgid(ruid, euid, sgid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setresgid isn't defined, cannot implement sys_setresgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setresgid */
+
+/*
+ * int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
+ */
+
+#ifdef __NR_getresuid
+static __attribute__((unused))
+pid_t sys_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid)
+{
+	return my_syscall3(__NR_getresuid, ruid, euid, suid);
+}
+
+static __attribute__((unused))
+pid_t getresuid(uid_t *ruid, uid_t *euid, gid_t *sgid)
+{
+	return sys_getresuid(ruid, euid, sgid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getresuid isn't defined, cannot implement sys_getresuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getresuid */
+
+/*
+ * int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
+ */
+
+#ifdef __NR_getresgid
+static __attribute__((unused))
+pid_t sys_getresgid(uid_t *ruid, uid_t *euid, gid_t *sgid)
+{
+	return my_syscall3(__NR_getresgid, ruid, euid, sgid);
+}
+
+static __attribute__((unused))
+pid_t getresgid(uid_t *ruid, uid_t *euid, gid_t *sgid)
+{
+	return sys_getresgid(ruid, euid, sgid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getresgid isn't defined, cannot implement sys_getresgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getresgid */
 
 /*
  * int gettimeofday(struct timeval *tv, struct timezone *tz);
