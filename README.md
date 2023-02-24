@@ -8,7 +8,7 @@
 
 # DESCRIPTION
 
-    This work is based over nolibc.
+    This work is based over nolibc while listening https://soundcloud.com/the_higher
 
 # TODO
 
