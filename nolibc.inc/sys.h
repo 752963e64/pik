@@ -51,6 +51,307 @@
 
 
 /*
+ * #include <sys/socket.h>
+
+ *      int accept(int sockfd, struct sockaddr *restrict addr,
+ *        socklen_t *restrict addrlen);
+
+ *     #define _GNU_SOURCE
+ *      #include <sys/socket.h>
+
+ *      int accept4(int sockfd, struct sockaddr *restrict addr,
+ *        socklen_t *restrict addrlen, int flags);
+ */
+
+#ifdef __NR_accept
+static __attribute__((unused))
+int sys_accept(int sockfd,
+  struct sockaddr *restrict addr, socklen_t *restrict addrlen)
+{
+	return my_syscall3(__NR_accept, sockfd, addr, addrlen);
+}
+
+static __attribute__((unused))
+int accept(int sockfd,
+  struct sockaddr *restrict addr, socklen_t *restrict addrlen)
+{
+	int ret = sys_accept(sockfd, addr, addrlen);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_accept isn't defined, cannot implement sys_accept()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_accept */
+
+/* __GNU_SOURCE */
+
+#ifdef __NR_accept4
+static __attribute__((unused))
+int sys_accept4(int sockfd,
+  struct sockaddr *restrict addr, socklen_t *restrict addrlen, int flags)
+{
+	return my_syscall3(__NR_accept4, sockfd, addr, addrlen, flags);
+}
+
+static __attribute__((unused))
+int accept4(int sockfd,
+  struct sockaddr *restrict addr, socklen_t *restrict addrlen, int flags)
+{
+	int ret = sys_accept4(sockfd, addr, addrlen, flags);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_accept4 isn't defined, cannot implement sys_accept4()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_accept4 */
+
+/*
+ * #include <unistd.h>
+ *
+ * int access(const char *pathname, int mode);
+ *
+ * #include <fcntl.h>
+ * #include <unistd.h>
+ *
+ * int faccessat(int dirfd, const char *pathname, int mode, int flags);
+ *
+ * #include <fcntl.h>
+ * #include <sys/syscall.h>
+ * #include <unistd.h>
+ *
+ * int syscall(SYS_faccessat2,
+ *   int dirfd, const char *pathname, int mode, int flags);
+ */
+
+#ifdef __NR_access
+static __attribute__((unused))
+int sys_access(const char *pathname, int mode)
+{
+	return my_syscall2(__NR_access, pathname, mode);
+}
+
+static __attribute__((unused))
+int access(const char *pathname, int mode)
+{
+	int ret = sys_access(pathname, mode);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_access isn't defined, cannot implement sys_access()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_access */
+
+
+/*
+ * #include <keyutils.h>
+ *
+ * key_serial_t add_key(const char *type, const char *description,
+ *                           const void *payload, size_t plen,
+ *                           key_serial_t keyring);
+ *
+ */
+
+#ifdef __NR_add_key
+static __attribute__((unused))
+int sys_add_key(const char *type,
+  const char *description, const void *payload, size_t plen, key_serial_t keyring)
+{
+	return my_syscall5(__NR_add_key, type, description, payload, plen, keyring);
+}
+
+static __attribute__((unused))
+int add_key(const char *type,
+  const char *description, const void *payload, size_t plen, key_serial_t keyring)
+{
+	int ret = sys_add_key(type, description, payload, plen, keyring);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_add_key isn't defined, cannot implement sys_add_key()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_add_key */
+
+/*
+ *      #include <sys/timex.h>
+ *      int adjtimex(struct timex *buf);
+ *      int clock_adjtime(clockid_t clk_id, struct timex *buf);
+ *      int ntp_adjtime(struct timex *buf);
+*/
+
+#ifdef __NR_adjtime
+static __attribute__((unused))
+int sys_adjtime(struct timex *buf)
+{
+	return my_syscall1(__NR_adjtime, buf);
+}
+
+static __attribute__((unused))
+int adjtime(struct timex *buf)
+{
+	int ret = sys_adjtime(buf);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_adjtime isn't defined, cannot implement sys_adjtime()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_adjtime */
+
+/* __NR_afs_syscall */
+
+/*
+  #include <unistd.h>
+  unsigned int alarm(unsigned int seconds);
+*/
+
+#ifdef __NR_alarm
+static __attribute__((unused))
+int sys_alarm(unsigned int seconds)
+{
+	return my_syscall1(__NR_alarm, seconds);
+}
+
+static __attribute__((unused))
+int alarm(unsigned int seconds)
+{
+	int ret = sys_alarm(seconds);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_alarm isn't defined, cannot implement sys_alarm()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_alarm */
+
+
+/*
+ *       #include <asm/prctl.h>
+ *      #include <sys/syscall.h>
+ *      #include <unistd.h>
+ *      int syscall(SYS_arch_prctl, int code, unsigned long addr);
+ *      int syscall(SYS_arch_prctl, int code, unsigned long *addr);
+ */
+
+#ifdef __NR_arch_prctl
+static __attribute__((unused))
+int sys_arch_prctl(int code, unsigned long addr)
+{
+	return my_syscall2(__NR_arch_prctl, code, addr);
+}
+
+static __attribute__((unused))
+int arch_prctl(int code, unsigned long addr)
+{
+	int ret = sys_arch_prctl(code, addr);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_arch_prctl isn't defined, cannot implement sys_arch_prctl()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_arch_prctl */
+
+/*
+ *  #include <sys/socket.h>
+ *  int bind(int sockfd, const struct sockaddr *addr,
+ *    socklen_t addrlen);
+ */
+
+#ifdef __NR_bind
+static __attribute__((unused))
+int sys_bind(int sockfd,
+  const struct sockaddr *addr, socklen_t addrlen)
+{
+	return my_syscall3(__NR_bind, sockfd, addr, addrlen);
+}
+
+static __attribute__((unused))
+int bind(int sockfd,
+  const struct sockaddr *addr, socklen_t addrlen)
+{
+	int ret = sys_bind(sockfd, addr, addrlen);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_bind isn't defined, cannot implement sys_bind()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_bind */
+
+/*
+ *  #include <linux/bpf.h>
+ *  int bpf(int cmd, union bpf_attr *attr, unsigned int size);
+*/
+
+#ifdef __NR_bpf
+static __attribute__((unused))
+int sys_bpf(int cmd, union bpf_attr *attr, unsigned int size)
+{
+	return my_syscall3(__NR_bpf, cmd, attr, size);
+}
+
+static __attribute__((unused))
+int bpf(int cmd, union bpf_attr *attr, unsigned int size)
+{
+	int ret = sys_bpf(cmd, attr, size);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_bpf isn't defined, cannot implement sys_bpf()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_bpf */
+
+/*
  * int brk(void *addr);
  * void *sbrk(intptr_t inc)
  */
@@ -91,6 +392,65 @@ void *sbrk(intptr_t inc)
 #error __NR_brk isn't defined, cannot implement sys_brk()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_brk */
+
+/*
+* #include <linux/capability.h>
+  #include <sys/syscall.h>
+  #include <unistd.h>
+*  int syscall(SYS_capget, cap_user_header_t hdrp,
+*    cap_user_data_t datap);
+*  int syscall(SYS_capset, cap_user_header_t hdrp,
+*                   const cap_user_data_t datap);
+*/
+
+#ifdef __NR_capget
+static __attribute__((unused))
+int sys_capget(cap_user_header_t hdrp, cap_user_data_t datap)
+{
+	return my_syscall1(__NR_capget, hdrp, datap);
+}
+
+static __attribute__((unused))
+int capget(cap_user_header_t hdrp, cap_user_data_t datap)
+{
+	int ret = sys_capget(hdrp, datap);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_capget isn't defined, cannot implement sys_capget()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_capget */
+
+#ifdef __NR_capset
+static __attribute__((unused))
+int sys_chdir(cap_user_header_t hdrp, const cap_user_data_t datap)
+{
+	return my_syscall1(__NR_capset, hdrp, datap);
+}
+
+static __attribute__((unused))
+int capset(cap_user_header_t hdrp, const cap_user_data_t datap)
+{
+	int ret = sys_capset(hdrp, datap);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_capset isn't defined, cannot implement sys_capset()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_capset */
+
 
 /*
  * int chdir(const char *path);
@@ -203,7 +563,6 @@ int fchmod(int fd, mode_t mode)
 #error __NR_fchmod isn't defined, cannot implement sys_fchmod()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_fchmod */
-
 
 /*
  * int fchmodat(const char *path, mode_t mode);
@@ -375,6 +734,189 @@ int chroot(const char *path)
 #endif /* __NR_chroot */
 
 /*
+ * int clock_adjtime(clockid_t clk_id, struct timex *buf);
+ */
+
+#ifdef __NR_clock_adjtime
+static __attribute__((unused))
+int sys_clock_adjtime(clockid_t clk_id, struct timex *buf)
+{
+	return my_syscall2(__NR_clock_adjtime, clk_id, buf);
+}
+
+static __attribute__((unused))
+int clock_adjtime(clockid_t clk_id, struct timex *buf)
+{
+	int ret = sys_clock_adjtime(clk_id, buf);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clock_adjtime isn't defined, cannot implement sys_clock_adjtime()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clock_adjtime */
+
+/*
+ * #include <time.h>
+ * int clock_getres(clockid_t clockid, struct timespec *res);
+ */
+
+#ifdef __NR_clock_getres
+static __attribute__((unused))
+int sys_clock_getres(clockid_t clk_id, struct timespec *res)
+{
+	return my_syscall2(__NR_clock_getres, clk_id, res);
+}
+
+static __attribute__((unused))
+int clock_getres(clockid_t clk_id, struct timespec *res)
+{
+	int ret = sys_clock_getres(clk_id, res);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clock_getres isn't defined, cannot implement sys_clock_getres()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clock_getres */
+
+/*
+ * #include <time.h>
+ * int clock_gettime(clockid_t clockid, struct timespec *tp);
+ */
+
+#ifdef __NR_clock_gettime
+static __attribute__((unused))
+int sys_clock_gettime(clockid_t clk_id, struct timespec *tp)
+{
+	return my_syscall2(__NR_clock_gettime, clk_id, tp);
+}
+
+static __attribute__((unused))
+int clock_gettime(clockid_t clk_id, struct timespec *tp)
+{
+	int ret = sys_clock_gettime(clk_id, tp);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clock_gettime isn't defined, cannot implement sys_clock_gettime()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clock_gettime */
+
+/*
+ * int clock_nanosleep(clockid_t clockid, int flags,
+ *                          const struct timespec *request,
+ *                          struct timespec *remain);
+ */
+
+#ifdef __NR_clock_nanosleep
+static __attribute__((unused))
+int sys_clock_nanosleep(clockid_t clk_id,
+  int flags, const struct timespec *request, struct timespec *remain)
+{
+	return my_syscall4(__NR_clock_nanosleep, clk_id, flags, request, remain);
+}
+
+static __attribute__((unused))
+int clock_nanosleep(clockid_t clk_id,
+  int flags, const struct timespec *request, struct timespec *remain)
+{
+	int ret = sys_clock_nanosleep(clk_id, flags, request, remain);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clock_nanosleep isn't defined, cannot implement sys_clock_nanosleep()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clock_nanosleep */
+
+/*
+ * #include <time.h>
+ * int clock_settime(clockid_t clockid, const struct timespec *tp);
+ */
+
+#ifdef __NR_clock_settime
+static __attribute__((unused))
+int sys_clock_settime(clockid_t clk_id, const struct timespec *tp)
+{
+	return my_syscall2(__NR_clock_settime, clk_id, tp);
+}
+
+static __attribute__((unused))
+int clock_settime(clockid_t clk_id, const struct timespec *tp)
+{
+	int ret = sys_clock_settime(clk_id, tp);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clock_settime isn't defined, cannot implement sys_clock_settime()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clock_settime */
+
+/*
+ * long clone(unsigned long flags, void *child_stack,
+     int *ptid, int *ctid,
+     unsigned long newtls);
+ */
+
+#ifdef __NR_clone
+static __attribute__((unused))
+long sys_clone(unsigned long flags, void *child_stack,
+  int *ptid, int *ctid,
+  unsigned long newtls)
+{ /* x86-64 */
+	return my_syscall5(__NR_clone, flags, child_stack, ptid, ctid, newtls);
+}
+
+static __attribute__((unused))
+long clone(unsigned long flags, void *child_stack,
+  int *ptid, int *ctid,
+  unsigned long newtls)
+{
+	pid_t ret = sys_clone(flags, child_stack, ptid, ctid, newtls);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_clone isn't defined, cannot implement sys_clone()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_clone */
+
+/* __NR_clone3 */
+
+/*
  * int close(int fd);
  */
 
@@ -401,6 +943,66 @@ int close(int fd)
 #error __NR_close isn't defined, cannot implement sys_close()
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_close */
+
+/*
+ * #include <linux/close_range.h>
+ * int close_range(unsigned int first, unsigned int last,
+ *                      unsigned int flags);
+ */
+
+#ifedf __NR_close_range
+static __attribute__((unused))
+int sys_close_range(unsigned int first, unsigned int last, unsigned int flags)
+{
+	return my_syscall3(__NR_close_range, first, last, flags);
+}
+
+static __attribute__((unused))
+int close_range(unsigned int first, unsigned int last, unsigned int flags)
+{
+	int ret = sys_close(first, last, flags);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_close_range isn't defined, cannot implement sys_close_range()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_close_range */
+
+/*
+ * #include <sys/socket.h>
+ * int connect(int sockfd, const struct sockaddr *addr,
+ *                  socklen_t addrlen);
+ */
+
+#ifedf __NR_connect
+static __attribute__((unused))
+int sys_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+	return my_syscall3(__NR_cconnect, sockfd, addr, addrlen);
+}
+
+static __attribute__((unused))
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+	int ret = sys_connect(sockfd, addr, addrlen);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_connect isn't defined, cannot implement sys_connect()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_connect */
 
 /*
  * int dup(int fd);
@@ -618,41 +1220,7 @@ pid_t fork(void)
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_fork */
 
-/*
- * long clone(unsigned long flags, void *child_stack,
-     int *ptid, int *ctid,
-     unsigned long newtls);
- */
 
-#ifdef __NR_clone
-static __attribute__((unused))
-long sys_clone(unsigned long flags, void *child_stack,
-  int *ptid, int *ctid,
-  unsigned long newtls)
-{ /* x86-64 */
-	return my_syscall5(__NR_clone, flags, child_stack, ptid, ctid, newtls);
-}
-
-static __attribute__((unused))
-long clone(unsigned long flags, void *child_stack,
-  int *ptid, int *ctid,
-  unsigned long newtls)
-{
-	pid_t ret = sys_clone(flags, child_stack, ptid, ctid, newtls);
-
-	if (ret < 0) {
-		SET_ERRNO(-ret);
-		ret = -1;
-	}
-	return ret;
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_clone isn't defined, cannot implement sys_clone()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_clone */
-
-/* __NR_clone3 */
 
 /*
  * int fsync(int fd);
@@ -799,6 +1367,216 @@ int getdents64(int fd, struct linux_dirent64 *dirp, int count)
 #endif /* __NR_getdents64 */
 
 /*
+ * int getdomainname(char *name, size_t len);
+ */
+
+#ifdef __NR_getdomainename
+static __attribute__((unused))
+int sys_getdomainename(char *name, size_t len)
+{
+	return my_syscall2(__NR_getdomainename, name, len);
+}
+
+static __attribute__((unused))
+int getdomainename(char *name, size_t len)
+{
+	int ret = sys_getdomainename(name, len);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getdomainename isn't defined, cannot implement sys_getdomainename()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getdomainename */
+
+/*
+ * gid_t getegid(void);
+ */
+
+#ifdef __NR_getegid
+static __attribute__((unused))
+gid_t sys_getegid(void)
+{
+	return my_syscall0(__NR_getegid);
+}
+
+static __attribute__((unused))
+gid_t getegid(void)
+{
+	return sys_getegid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getegid isn't defined, cannot implement sys_getegid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getegid */
+
+/*
+ * uid_t geteuid(void);
+ */
+
+#ifdef __NR_geteuid
+static __attribute__((unused))
+uid_t sys_geteuid(void)
+{
+	return my_syscall0(__NR_geteuid);
+}
+
+static __attribute__((unused))
+uid_t geteuid(void)
+{
+	return sys_geteuid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_geteuid isn't defined, cannot implement sys_geteuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_geteuid */
+
+/*
+ * gid_t getgid(void);
+ */
+
+#ifdef __NR_getgid
+static __attribute__((unused))
+gid_t sys_getgid(void)
+{
+	return my_syscall0(__NR_getgid);
+}
+
+static __attribute__((unused))
+gid_t getgid(void)
+{
+	return sys_getgid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getgid isn't defined, cannot implement sys_getgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getgid */
+
+/*
+ * int getgroups(int size, gid_t list[]);
+ */
+
+#ifdef __NR_getgroups
+static __attribute__((unused))
+pid_t sys_getgroups(int size, gid_t list[])
+{
+	return my_syscall2(__NR_getgroups, size, list);
+}
+
+static __attribute__((unused))
+pid_t getgroups(int size, gid_t list[])
+{
+	pid_t ret = sys_getgroups(size, list);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getgroups isn't defined, cannot implement sys_getgroups()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getgroups */
+
+
+/*
+ * int gethostname(char *name, size_t len);
+ */
+
+#ifdef __NR_gethostname
+static __attribute__((unused))
+int sys_gethostname(char *name, size_t len)
+{
+	return my_syscall1(__NR_gethostname, name, len);
+}
+
+static __attribute__((unused))
+int gethostname(char *name, size_t len)
+{
+	int ret = sys_gethostname(char *name, size_t len);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_gethostanme isn't defined, cannot implement sys_gethostname()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_gethostname */
+
+/*
+ *  int getitimer(int which, struct itimerval *curr_value);
+ */
+
+#ifdef __NR_getitimer
+static __attribute__((unused))
+int sys_getitimer(int which, struct itimerval *curr_value)
+{
+	return my_syscall2(__NR_getitimer, which, curr_value);
+}
+
+static __attribute__((unused))
+int getitimer(int which, struct itimerval *curr_value)
+{
+	int ret = sys_getitimer(which, curr_value);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getitimer isn't defined, cannot implement sys_getitimer()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getitimer */
+
+
+/*
+ * int getpeername(int sockfd, struct sockaddr *restrict addr,
+ *                      socklen_t *restrict addrlen);
+ */
+
+#ifdef __NR_getpeername
+static __attribute__((unused))
+int sys_getpeername(int sockfd, struct sockaddr *restrict addr, socklen_t *restrict addrlen)
+{
+	return my_syscall2(__NR_getpeername, sockfd, addr, addrlen);
+}
+
+static __attribute__((unused))
+int getpeername(int sockfd, struct sockaddr *restrict addr, socklen_t *restrict addrlen)
+{
+	int ret = sys_getpeername(sockfd, addr, addrlen);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getpeername isn't defined, cannot implement sys_getpeername()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getpeername */
+
+
+/*
  * pid_t getpgid(pid_t pid);
  */
 
@@ -832,13 +1610,12 @@ pid_t getpgid(pid_t pid)
 
 #ifdef __NR_getpgrp
 static __attribute__((unused))
-pid_t sys_getpgrp(void)
+uid_t sys_getpgrp(void)
 {
-	return sys_getpgid(0);
+	return my_syscall0(__NR_getpgrp);
 }
-
 static __attribute__((unused))
-pid_t getpgrp(void)
+pid_t sys_getpgrp(void)
 {
 	return sys_getpgrp();
 }
@@ -893,289 +1670,70 @@ pid_t getppid(void)
 #endif /* __NR_getppid */
 
 /*
-       int getpriority(int which, id_t who);
-       int setpriority(int which, id_t who, int prio);
-       ssize_t getrandom(void *buf, size_t buflen, unsigned int flags);
-*/
-
-/*
- * pid_t gettid(void);
+ * int getpriority(int which, id_t who);
  */
 
-#ifdef __NR_gettid
+#ifdef __NR_getpriority
 static __attribute__((unused))
-pid_t sys_gettid(void)
+int sys_getpriority(int which, id_t who)
 {
-	return my_syscall0(__NR_gettid);
+	return my_syscall2(__NR_getpriority, which, who);
 }
 
 static __attribute__((unused))
-pid_t gettid(void)
+int getppriority(int which, id_t who)
 {
-	return sys_gettid();
+	return sys_getpriority(which, who);
 }
 #else
 #ifdef __NOLIBC_TEST_SYS
-#error __NR_gettid isn't defined, cannot implement sys_gettid()
+#error __NR_getpriority isn't defined, cannot implement sys_getpriority()
 #endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_gettid */
+#endif /* __NR_getpriority */
 
 /*
- * uid_t getuid(void);
+ * ssize_t getrandom(void *buf, size_t buflen, unsigned int flags);
  */
 
-#ifdef __NR_getuid
+#ifdef __NR_getrandom
 static __attribute__((unused))
-pid_t sys_getuid(void)
+ssize_t sys_getrandom(void *buf, size_t buflen, unsigned int flags)
 {
-	return my_syscall0(__NR_getuid);
+	return my_syscall3(__NR_getrandom, buf, buflen, flags);
 }
 
 static __attribute__((unused))
-int getuid(void)
+ssize_t getrandom(void *buf, size_t buflen, unsigned int flags)
 {
-	return sys_getuid();
+	return sys_getrandom(buf, buflen, flags);
 }
 #else
 #ifdef __NOLIBC_TEST_SYS
-#error __NR_getuid isn't defined, cannot implement sys_getuid()
+#error __NR_getrandom isn't defined, cannot implement sys_getrandom()
 #endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_getuid */
+#endif /* __NR_getrandom */
 
 /*
- * int setuid(uid_t uid);
+ * int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
  */
 
-#ifdef __NR_setuid
+#ifdef __NR_getresgid
 static __attribute__((unused))
-uid_t sys_setuid(uid_t uid)
+pid_t sys_getresgid(uid_t *ruid, uid_t *euid, gid_t *sgid)
 {
-	return my_syscall1(__NR_setuid, uid);
+	return my_syscall3(__NR_getresgid, ruid, euid, sgid);
 }
 
 static __attribute__((unused))
-uid_t setuid(uid_t uid)
+pid_t getresgid(uid_t *ruid, uid_t *euid, gid_t *sgid)
 {
-	return sys_setuid(uid);
+	return sys_getresgid(ruid, euid, sgid);
 }
 #else
 #ifdef __NOLIBC_TEST_SYS
-#error __NR_setuid isn't defined, cannot implement sys_setuid()
+#error __NR_getresgid isn't defined, cannot implement sys_getresgid()
 #endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setuid */
-
-/*
- * pid_t getgid(void);
- */
-
-#ifdef __NR_getgid
-static __attribute__((unused))
-pid_t sys_getgid(void)
-{
-	return my_syscall0(__NR_getgid);
-}
-
-static __attribute__((unused))
-pid_t getgid(void)
-{
-	return sys_getgid();
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_getgid isn't defined, cannot implement sys_getgid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_getgid */
-
-/*
- * pid_t setgid(gid_t gid);
- */
-
-#ifdef __NR_setgid
-static __attribute__((unused))
-pid_t sys_setgid(gid_t gid)
-{
-	return my_syscall1(__NR_setgid, gid);
-}
-
-static __attribute__((unused))
-pid_t setgid(gid_t gid)
-{
-	return sys_setgid(gid);
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_setgid isn't defined, cannot implement sys_setgid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setgid */
-
-/*
- * pid_t geteuid(void);
- */
-
-#ifdef __NR_geteuid
-static __attribute__((unused))
-pid_t sys_geteuid(void)
-{
-	return my_syscall0(__NR_geteuid);
-}
-
-static __attribute__((unused))
-pid_t geteuid(void)
-{
-	return sys_geteuid();
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_geteuid isn't defined, cannot implement sys_geteuid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_geteuid */
-
-/*
- * pid_t getegid(void);
- */
-
-#ifdef __NR_getegid
-static __attribute__((unused))
-pid_t sys_getegid(void)
-{
-	return my_syscall0(__NR_getegid);
-}
-
-static __attribute__((unused))
-pid_t getegid(void)
-{
-	return sys_getegid();
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_getegid isn't defined, cannot implement sys_getegid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_getegid */
-
-/*
-       int getgroups(int size, gid_t list[]);
-       int setgroups(size_t size, const gid_t *list);
-*/
-
-/*
- * int setreuid(uid_t ruid, uid_t euid);
- */
-
-#ifdef __NR_setreuid
-static __attribute__((unused))
-pid_t sys_setreuid(uid_t ruid, uid_t euid)
-{
-	return my_syscall2(__NR_setreuid, ruid, euid);
-}
-
-static __attribute__((unused))
-pid_t setreuid(uid_t ruid, uid_t euid)
-{
-	return sys_setreuid(ruid, euid);
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_setreuid isn't defined, cannot implement sys_setreuid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setreuid */
-
-/*
- * int setregid(gid_t rgid, gid_t egid);
- */
-
-#ifdef __NR_setregid
-static __attribute__((unused))
-pid_t sys_setregid(uid_t ruid, uid_t euid)
-{
-	return my_syscall2(__NR_setregid, ruid, euid);
-}
-
-static __attribute__((unused))
-pid_t setregid(uid_t ruid, uid_t euid)
-{
-	return sys_setregid(ruid, euid);
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_setregid isn't defined, cannot implement sys_setregid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setregid */
-
-/*
-       int gethostname(char *name, size_t len);
-       int sethostname(const char *name, size_t len);
-       int getitimer(int which, struct itimerval *curr_value);
-       int setitimer(int which, const struct itimerval *restrict new_value,
-                     struct itimerval *restrict old_value);
-*/
-
-
-/*
- * int setregid(gid_t rgid, gid_t egid);
- */
-
-#ifdef __NR_setregid
-static __attribute__((unused))
-pid_t sys_setregid(uid_t ruid, uid_t euid)
-{
-	return my_syscall2(__NR_setregid, ruid, euid);
-}
-
-static __attribute__((unused))
-pid_t setregid(uid_t ruid, uid_t euid)
-{
-	return sys_setregid(ruid, euid);
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_setregid isn't defined, cannot implement sys_setregid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setregid */
-
-
-/*
- * int setresuid(uid_t ruid, uid_t euid, uid_t suid);
- */
-
-#ifdef __NR_setresuid
-static __attribute__((unused))
-pid_t sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
-{
-	return my_syscall3(__NR_setresuid, ruid, euid, suid);
-}
-
-static __attribute__((unused))
-pid_t setresuid(uid_t ruid, uid_t euid, uid_t suid)
-{
-	return sys_setresuid(ruid, euid, suid);
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_setresuid isn't defined, cannot implement sys_setresuid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setresuid */
-
-/*
- *int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
- */
-
-#ifdef __NR_setresgid
-static __attribute__((unused))
-pid_t sys_setresgid(uid_t ruid, uid_t euid, gid_t sgid)
-{
-	return my_syscall3(__NR_setresgid, ruid, euid, sgid);
-}
-
-static __attribute__((unused))
-pid_t setresgid(uid_t ruid, uid_t euid, gid_t sgid)
-{
-	return sys_setresgid(ruid, euid, sgid);
-}
-#else
-#ifdef __NOLIBC_TEST_SYS
-#error __NR_setresgid isn't defined, cannot implement sys_setresgid()
-#endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_setresgid */
+#endif /* __NR_getresgid */
 
 /*
  * int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
@@ -1199,27 +1757,170 @@ pid_t getresuid(uid_t *ruid, uid_t *euid, gid_t *sgid)
 #endif /* __NOLIBC_TEST_SYS */
 #endif /* __NR_getresuid */
 
-/*
- * int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
- */
 
-#ifdef __NR_getresgid
+/******************************************************/
+
+/*
+int getrlimit(int resource, struct rlimit *rlim);
+*/
+
+#ifdef __NR_getrlimit
 static __attribute__((unused))
-pid_t sys_getresgid(uid_t *ruid, uid_t *euid, gid_t *sgid)
+int sys_getrlimit(int resource, struct rlimit *rlim)
 {
-	return my_syscall3(__NR_getresgid, ruid, euid, sgid);
+	return my_syscall2(__NR_getrlimit, resource, rlim);
 }
 
 static __attribute__((unused))
-pid_t getresgid(uid_t *ruid, uid_t *euid, gid_t *sgid)
+int getrlimit(int resource, struct rlimit *rlim)
 {
-	return sys_getresgid(ruid, euid, sgid);
+	return sys_getrlimit(resource, rlimit, rlim);
 }
 #else
 #ifdef __NOLIBC_TEST_SYS
-#error __NR_getresgid isn't defined, cannot implement sys_getresgid()
+#error __NR_getrlmit isn't defined, cannot implement sys_getrlimit()
 #endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_getresgid */
+#endif /* __NR_getrlimit */
+
+/*
+ * int prlimit(pid_t pid, int resource, const struct rlimit *new_limit,
+ *                  struct rlimit *old_limit);
+ */
+
+/*
+ * int getrusage(int who, struct rusage *usage);
+ */
+
+#ifdef __NR_getrusage
+static __attribute__((unused))
+int sys_getrusage(int who, struct rusage *usage)
+{
+	return my_syscall2(__NR_getrusage, who, usage);
+}
+
+static __attribute__((unused))
+int getrusage(int who, struct rusage *usage)
+{
+	return sys_getrusage(who, usage);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getrusage isn't defined, cannot implement sys_getrusage()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getrusage */
+
+/*
+ * pid_t getsid(pid_t pid);
+ */
+
+#ifdef __NR_getsid
+static __attribute__((unused))
+pid_t sys_getsid(pid_t pid)
+{
+	return my_syscall1(__NR_setsid, pid);
+}
+
+static __attribute__((unused))
+pid_t getsid(pid_t pid)
+{
+	pid_t ret = sys_getsid(pid);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getsid isn't defined, cannot implement sys_getsid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getsid */
+
+/*
+ * int getsockname(int sockfd, struct sockaddr *restrict addr,
+ *                      socklen_t *restrict addrlen);
+ */
+
+#ifdef __NR_getsockname()
+static __attribute__((unused))
+int sys_getsockname(int sockfd,
+  struct sockaddr *restrict addr, socklen_t *restrict addrlen)
+{
+	return my_syscall3(__NR_getsockname, sockfd, addr, addrlen);
+}
+
+static __attribute__((unused))
+int getsockname(int sockfd,
+  struct sockaddr *restrict addr, socklen_t *restrict addrlen)
+{
+	pid_t ret = sys_getsockname(int sockfd,
+    struct sockaddr *restrict addr, socklen_t *restrict addrlen);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getsockname isn't defined, cannot implement sys_getsockname()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getsockname */
+
+/*
+ * int getsockopt(int sockfd, int level, int optname,
+ *       void *restrict optval, socklen_t *restrict optlen);
+ */
+
+#ifdef __NR_getsockopt()
+static __attribute__((unused))
+int sys_getsockopt(int sockfd, int level, int optname,
+  void *restrict optval, socklen_t *restrict optlen)
+{
+	return my_syscall5(__NR_getsockopt, sockfd, level, optname, optval, optlen);
+}
+
+static __attribute__((unused))
+int getsockopt(int sockfd, int level, int optname,
+  void *restrict optval, socklen_t *restrict optlen)
+{
+	int ret = sys_getsockopt(sockfd, level, optname, optval, optlen);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getsockopt isn't defined, cannot implement sys_getsockopt()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getsockopt */
+
+/*
+ * pid_t gettid(void);
+ */
+
+#ifdef __NR_gettid
+static __attribute__((unused))
+pid_t sys_gettid(void)
+{
+	return my_syscall0(__NR_gettid);
+}
+
+static __attribute__((unused))
+pid_t gettid(void)
+{
+	return sys_gettid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_gettid isn't defined, cannot implement sys_gettid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_gettid */
 
 /*
  * int gettimeofday(struct timeval *tv, struct timezone *tz);
@@ -1250,20 +1951,45 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 #endif /* __NR_gettimeofday */
 
 /*
- * int settimeofday(const struct timeval *tv, const struct timezone *tz);
+ * uid_t getuid(void);
  */
 
-#ifdef __NR_settimeofday
+#ifdef __NR_getuid
 static __attribute__((unused))
-int sys_settimeofday(const struct timeval *tv, const struct timezone *tz)
+pid_t sys_getuid(void)
 {
-	return my_syscall2(__NR_settimeofday, tv, tz);
+	return my_syscall0(__NR_getuid);
 }
 
 static __attribute__((unused))
-int settimeofday(const struct timeval *tv, const struct timezone *tz)
+int getuid(void)
 {
-	int ret = sys_settimeofday(tv, tz);
+	return sys_getuid();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_getuid isn't defined, cannot implement sys_getuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_getuid */
+
+/********************************************************************************
+ssize_t getxattr(const char *path, const char *name,
+                        void *value, size_t size);
+*/
+
+#ifdef __NR_getxattr
+static __attribute__((unused))
+ssize_t sys_getxattr(const char *path,
+  const char *name, void *value, size_t size)
+{
+	return my_syscall4(__NR_getxattr, path, name, value, size);
+}
+
+static __attribute__((unused))
+ssize_t getxattr(const char *path,
+  const char *name, void *value, size_t size)
+{
+  int ret = sys_getxattr(path, name, value, size);
 
 	if (ret < 0) {
 		SET_ERRNO(-ret);
@@ -1273,9 +1999,376 @@ int settimeofday(const struct timeval *tv, const struct timezone *tz)
 }
 #else
 #ifdef __NOLIBC_TEST_SYS
-#error __NR_settimeofday isn't defined, cannot implement sys_settimeofday()
+#error __NR_getxattr isn't defined, cannot implement sys_getxattr()
 #endif /* __NOLIBC_TEST_SYS */
-#endif /* __NR_settimeofday */
+#endif /* __NR_getxattr */
+
+
+/*
+ * int syscall(SYS_init_module, void *module_image, unsigned long len,
+ *                  const char *param_values);
+******/
+
+static __attribute__((unused))
+int sys_init_module()
+{
+  /* call sys_syscall */
+}
+
+static __attribute__((unused))
+int init_module()
+{
+	return sys_init_module();
+}
+
+/*
+ * int syscall(SYS_finit_module, int fd, const char *param_values,
+ *                  int flags);
+ *************/
+
+static __attribute__((unused))
+int sys_finit_module()
+{
+  /* call sys_syscall */
+}
+
+static __attribute__((unused))
+int finit_module()
+{
+	return sys_finit_module();
+}
+
+/*
+ * int inotify_add_watch(int fd, const char *pathname, uint32_t mask);
+ ***/
+
+#ifdef __NR_inotify_add_watch
+static __attribute__((unused))
+int sys_inotify_add_watch(int fd, const char *pathname, uint32_t mask)
+{
+	return my_syscall3(__NR_inotify_add_watch, fd, pathname, mask);
+}
+
+static __attribute__((unused))
+int inotify_add_watch(int fd, const char *pathname, uint32_t mask)
+{
+  int ret = sys_inotify_add_watch(fd, pathname, mask);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_inotify_add_watch isn't defined, cannot implement sys_inotify_add_watch()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_inotify_add_watch */
+
+/*
+  int inotify_init(void);
+  int inotify_init1(int flags);
+  Both available while one fits the job.
+  inotify_init1(0) == inotify_init()
+*/
+
+#ifdef __NR_inotify_init
+static __attribute__((unused))
+int sys_inotify_init(void)
+{
+	return my_syscall0(__NR_inotify_init);
+}
+
+static __attribute__((unused))
+int inotify_init(void)
+{
+  int ret = sys_inotify_init();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_inotify_init isn't defined, cannot implement sys_inotify_init()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_inotify_init */
+
+/*****************************************************************/
+
+#ifdef __NR_inotify_init1
+static __attribute__((unused))
+int sys_inotify_init1(int flags)
+{
+	return my_syscall1(__NR_inotify_init1, flags);
+}
+
+static __attribute__((unused))
+int inotify_init1(int flags)
+{
+  int ret = sys_inotify_init1(flags);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_inotify_init1 isn't defined, cannot implement sys_inotify_init1()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_inotify_init1 */
+
+/*
+ * int inotify_rm_watch(int fd, int wd);
+ */
+
+#ifdef __NR_inotify_rm_watch
+static __attribute__((unused))
+int sys_inotify_rm_watch(int fd, int wd)
+{
+	return my_syscall2(__NR_inotify_rm_watch, fd, wd);
+}
+
+static __attribute__((unused))
+int inotify_rm_watch(int fd, int wd)
+{
+  int ret = sys_inotify_rm_watch(fd, wd);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_inotify_rm_watch isn't defined, cannot implement sys_inotify_rm_watch()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_inotify_watch */
+
+/*
+ * int syscall(SYS_io_cancel,
+ *   aio_context_t ctx_id, struct iocb *iocb, struct io_event *result);
+ */
+
+#ifdef __NR_io_cancel
+static __attribute__((unused))
+int sys_io_cancel()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_cancel()
+{
+  int ret = sys_io_cancel();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_io_cancel isn't defined, cannot implement sys_io_cancel()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_io_cancel */
+
+/*
+ * int syscall(SYS_io_destroy, aio_context_t ctx_id);
+ */
+
+static __attribute__((unused))
+int sys_io_cancel()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_cancel()
+{
+  int ret = sys_io_cancel();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+
+/***
+  * int syscall(SYS_io_getevents, aio_context_t ctx_id,
+  *                 long min_nr, long nr, struct io_event *events,
+  *                 struct timespec *timeout);
+ */
+
+static __attribute__((unused))
+int sys_io_getevents()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_getevents()
+{
+  int ret = sys_io_getevents();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/***
+  * int syscall(SYS_io_pgetevents, aio_context_t ctx_id,
+  *                 long min_nr, long nr, struct io_event *events,
+  *                 struct timespec *timeout);
+ */
+
+static __attribute__((unused))
+int sys_io_pgetevents()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_pgetevents()
+{
+  int ret = sys_io_pgetevents();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/***
+  * int syscall(SYS_io_setup, unsigned int nr_events, aio_context_t ctx_id);
+ */
+
+static __attribute__((unused))
+int sys_io_setup()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_setup()
+{
+  int ret = sys_io_setup();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+ * int syscall(SYS_io_submit, aio_context_t ctx_id, long nr, struct iocb **iocbpp);
+ */
+
+static __attribute__((unused))
+int sys_io_submit()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_submit()
+{
+  int ret = sys_io_submit();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+ *      int syscall(SYS_io_uring_enter, unsigned int fd, unsigned int to_submit,
+ *                         unsigned int min_complete, unsigned int flags,
+ *                         sigset_t *sig);
+
+ *      int syscall(SYS_io_uring_enter2, unsigned int fd, unsigned int to_submit,
+ *                          unsigned int min_complete, unsigned int flags,
+ *                          sigset_t *sig, size_t sz);
+ */
+
+static __attribute__((unused))
+int sys_io_uring_enter()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_uring_enter()
+{
+  int ret = sys_io_uring_enter();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+
+/*
+ * int syscall(SYS_io_uring_register, unsigned int fd, unsigned int opcode,
+                             void *arg, unsigned int nr_args);
+ */
+
+static __attribute__((unused))
+int sys_io_uring_register()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_uring_register()
+{
+  int ret = sys_io_uring_register();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+
+/*
+ * int syscall(SYS_io_uring_setup, u32 entries, struct io_uring_params *p);
+ */
+
+static __attribute__((unused))
+int sys_io_uring_setup()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int io_uring_setup()
+{
+  int ret = sys_io_uring_setup();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
 
 /*
  * int ioctl(int fd, unsigned long req, void *value);
@@ -1306,9 +2399,223 @@ int ioctl(int fd, unsigned long req, void *value)
 #endif /* __NR_ioctl */
 
 /*
- * int kill(pid_t pid, int signal);
+ * int ioperm(unsigned long from, unsigned long num, int turn_on);
  */
 
+#ifdef __NR_ioperm
+static __attribute__((unused))
+int sys_ioperm(unsigned long from, unsigned long num, int turn_on)
+{
+	return my_syscall3(__NR_ioperm, from, num, turn_on);
+}
+
+static __attribute__((unused))
+int ioperm(unsigned long from, unsigned long num, int turn_on)
+{
+	int ret = sys_ioperm(from, num, turn_on);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_ioperm isn't defined, cannot implement sys_ioperm()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_ioperm */
+
+/*
+ * int iopl(int level);
+ */
+
+#ifdef __NR_iopl
+static __attribute__((unused))
+int sys_iopl(int level)
+{
+	return my_syscall1(__NR_iopl, level);
+}
+
+static __attribute__((unused))
+int iopl(int level)
+{
+	int ret = sys_iopl(level);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_iopl isn't defined, cannot implement sys_iopl()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_iopl */
+
+/*
+ * int syscall(SYS_ioprio_get, int which, int who);
+ * int syscall(SYS_ioprio_set, int which, int who, int ioprio);
+ */
+
+static __attribute__((unused))
+int sys_ioprio_get()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int ioprio_get()
+{
+  int ret = sys_ioprio_get();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+static __attribute__((unused))
+int sys_ioprio_set()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int ioprio_set()
+{
+  int ret = sys_ioprio_set();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+  int syscall(SYS_ipc, unsigned int call, int first,
+    unsigned long second, unsigned long third, void *ptr,
+    long fifth);
+*/
+
+static __attribute__((unused))
+int sys_ipc()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int ipc()
+{
+  int ret = sys_ipc();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+ int syscall(SYS_kcmp, pid_t pid1, pid_t pid2, int type,
+    unsigned long idx1, unsigned long idx2);
+*/
+
+static __attribute__((unused))
+int sys_kcmp()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int kcmp()
+{
+  int ret = sys_kcmp();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+ * long syscall(SYS_kexec_load, unsigned long entry,
+ *                   unsigned long nr_segments, struct kexec_segment *segments,
+ *                   unsigned long flags);
+ * long syscall(SYS_kexec_file_load, int kernel_fd, int initrd_fd,
+ *                   unsigned long cmdline_len, const char *cmdline,
+ *                   unsigned long flags);
+ */
+
+static __attribute__((unused))
+int sys_kexec_load()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int kexec_load()
+{
+  int ret = sys_kexec_load();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+static __attribute__((unused))
+int sys_kexec_file_load()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int kexec_file_load()
+{
+  int ret = sys_kexec_file_load();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+ * long syscall(SYS_keyctl, int operation, unsigned long arg2,
+ *                   unsigned long arg3, unsigned long arg4,
+ *                   unsigned long arg5);
+ */
+
+static __attribute__((unused))
+int sys_keyctl()
+{
+	/* syscall has better implementation to catch error we uses that one. */
+}
+
+static __attribute__((unused))
+int keyctl()
+{
+  int ret = sys_keyctl();
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+
+/*
+ * int kill(pid_t pid, int signal);
+ */
+ 
+#ifdef __NR_kill
 static __attribute__((unused))
 int sys_kill(pid_t pid, int signal)
 {
@@ -1326,6 +2633,325 @@ int kill(pid_t pid, int signal)
 	}
 	return ret;
 }
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_kill isn't defined, cannot implement sys_kill()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_kill */
+
+/*
+ssize_t lgetxattr(const char *path, const char *name,
+                        void *value, size_t size);
+ssize_t fgetxattr(int fd, const char *name,
+                        void *value, size_t size);
+
+*********************************************************************************/
+
+/*
+ * int setuid(uid_t uid);
+ */
+
+#ifdef __NR_setuid
+static __attribute__((unused))
+uid_t sys_setuid(uid_t uid)
+{
+	return my_syscall1(__NR_setuid, uid);
+}
+
+static __attribute__((unused))
+uid_t setuid(uid_t uid)
+{
+	return sys_setuid(uid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setuid isn't defined, cannot implement sys_setuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setuid */
+
+/*
+ * pid_t setgid(gid_t gid);
+ */
+
+#ifdef __NR_setgid
+static __attribute__((unused))
+pid_t sys_setgid(gid_t gid)
+{
+	return my_syscall1(__NR_setgid, gid);
+}
+
+static __attribute__((unused))
+pid_t setgid(gid_t gid)
+{
+	return sys_setgid(gid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setgid isn't defined, cannot implement sys_setgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setgid */
+
+/*
+ * int setreuid(uid_t ruid, uid_t euid);
+ */
+
+#ifdef __NR_setreuid
+static __attribute__((unused))
+pid_t sys_setreuid(uid_t ruid, uid_t euid)
+{
+	return my_syscall2(__NR_setreuid, ruid, euid);
+}
+
+static __attribute__((unused))
+pid_t setreuid(uid_t ruid, uid_t euid)
+{
+	return sys_setreuid(ruid, euid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setreuid isn't defined, cannot implement sys_setreuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setreuid */
+
+/*
+ *int setpgid(pid_t pid, pid_t pgid);
+ */
+
+#ifdef __NR_setpgid
+static __attribute__((unused))
+int sys_setpgid(pid_t pid, pid_t pgid)
+{
+	return my_syscall2(__NR_setpgid, pid, pgid);
+}
+
+static __attribute__((unused))
+pid_t setpgid(pid_t pid, pid_t pgid)
+{
+	pid_t ret = sys_setpgid(pid, pgid);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setpgid isn't defined, cannot implement sys_setpgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setpgid */
+
+/*
+ * int setregid(gid_t rgid, gid_t egid);
+ */
+
+#ifdef __NR_setregid
+static __attribute__((unused))
+pid_t sys_setregid(uid_t ruid, uid_t euid)
+{
+	return my_syscall2(__NR_setregid, ruid, euid);
+}
+
+static __attribute__((unused))
+pid_t setregid(uid_t ruid, uid_t euid)
+{
+	return sys_setregid(ruid, euid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setregid isn't defined, cannot implement sys_setregid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setregid */
+
+
+/*
+ * int setregid(gid_t rgid, gid_t egid);
+ */
+
+#ifdef __NR_setregid
+static __attribute__((unused))
+pid_t sys_setregid(uid_t ruid, uid_t euid)
+{
+	return my_syscall2(__NR_setregid, ruid, euid);
+}
+
+static __attribute__((unused))
+pid_t setregid(uid_t ruid, uid_t euid)
+{
+	return sys_setregid(ruid, euid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setregid isn't defined, cannot implement sys_setregid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setregid */
+
+
+
+
+
+
+
+
+
+
+/*
+ * pid_t setpgrp(void);
+ * int setpgrp(void);  System V version POSIX.1
+ * int setpgrp(pid_t pid, pid_t pgid); BSD version
+ */
+
+/*
+ * int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+ */
+
+#ifdef __NR_setresuid
+static __attribute__((unused))
+pid_t sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
+{
+	return my_syscall3(__NR_setresuid, ruid, euid, suid);
+}
+
+static __attribute__((unused))
+pid_t setresuid(uid_t ruid, uid_t euid, uid_t suid)
+{
+	return sys_setresuid(ruid, euid, suid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setresuid isn't defined, cannot implement sys_setresuid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setresuid */
+
+#ifdef __NR_setpgrp
+static __attribute__((unused))
+uid_t sys_setpgrp(void)
+{
+	return my_syscall2(__NR_setpgid, 0, 0);
+}
+
+static __attribute__((unused))
+pid_t sys_setpgrp(void)
+{
+	return sys_setpgrp();
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setpgrp isn't defined, cannot implement sys_setpgrp()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setpgrp */
+
+/*
+ * int setdomainname(const char *name, size_t len);
+ */
+
+#ifdef __NR_setdomainename
+static __attribute__((unused))
+int sys_setdomainename(const char *name, size_t len)
+{
+	return my_syscall2(__NR_setdomainename, name, len);
+}
+
+static __attribute__((unused))
+int setdomainename(const char *name, size_t len)
+{
+	int ret = sys_setdomainename(name, len);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setdomainename isn't defined, cannot implement sys_setdomainename()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setdomainename */
+
+/*
+ * int settimeofday(const struct timeval *tv, const struct timezone *tz);
+ */
+
+#ifdef __NR_settimeofday
+static __attribute__((unused))
+int sys_settimeofday(const struct timeval *tv, const struct timezone *tz)
+{
+	return my_syscall2(__NR_settimeofday, tv, tz);
+}
+
+static __attribute__((unused))
+int settimeofday(const struct timeval *tv, const struct timezone *tz)
+{
+	int ret = sys_settimeofday(tv, tz);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_settimeofday isn't defined, cannot implement sys_settimeofday()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_settimeofday */
+
+/*
+int setrlimit(int resource, const struct rlimit *rlim);
+*/
+
+#ifdef __NR_setrlimit
+static __attribute__((unused))
+int sys_setrlimit(int resource, const struct rlimit *rlim)
+{
+	return my_syscall2(__NR_setrlimit, resource, rlim);
+}
+
+static __attribute__((unused))
+int setrlimit(int resource, struct rlimit *rlim)
+{
+	return sys_setrlimit(resource, rlim);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setrlmit isn't defined, cannot implement sys_setrlimit()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setrlimit */
+
+/*
+ * int setgroups(size_t size, const gid_t *list);
+ */
+
+#ifdef __NR_setgroups
+static __attribute__((unused))
+pid_t sys_setgroups(size_t size, const gid_t list[])
+{
+	return my_syscall2(__NR_setgroups, size, list);
+}
+
+static __attribute__((unused))
+pid_t setgroups(size_t size, gid_t list[])
+{
+	pid_t ret = sys_setgroups(size, list);
+
+	if (ret < 0) {
+		SET_ERRNO(-ret);
+		ret = -1;
+	}
+	return ret;
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setgroups isn't defined, cannot implement sys_setgroups()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setgroups */
+
+/*
+       int sethostname(const char *name, size_t len);
+       int setitimer(int which, const struct itimerval *restrict new_value,
+                     struct itimerval *restrict old_value);
+*/
 
 
 /*
@@ -1783,6 +3409,50 @@ int setpgid(pid_t pid, pid_t pgid)
 	}
 	return ret;
 }
+
+/*
+ * int setpriority(int which, id_t who, int prio);
+ */
+
+#ifdef __NR_setpriority
+static __attribute__((unused))
+int sys_setpriority(int which, id_t who, int prio)
+{
+	return my_syscall3(__NR_setpriority, which, who, prio);
+}
+
+static __attribute__((unused))
+int setppriority(int which, id_t who, int prio)
+{
+	return sys_setpriority(which, who, prio);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setpriority isn't defined, cannot implement sys_setppriority()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setpriority */
+
+/*
+ *int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+ */
+
+#ifdef __NR_setresgid
+static __attribute__((unused))
+int sys_setresgid(uid_t ruid, uid_t euid, gid_t sgid)
+{
+	return my_syscall3(__NR_setresgid, ruid, euid, sgid);
+}
+
+static __attribute__((unused))
+int setresgid(uid_t ruid, uid_t euid, gid_t sgid)
+{
+	return sys_setresgid(ruid, euid, sgid);
+}
+#else
+#ifdef __NOLIBC_TEST_SYS
+#error __NR_setresgid isn't defined, cannot implement sys_setresgid()
+#endif /* __NOLIBC_TEST_SYS */
+#endif /* __NR_setresgid */
 
 
 /*
